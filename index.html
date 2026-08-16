@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cobinar Search Engine</title>
     <style>
-        /* Clean, brutalist dark mode UI */
         :root {
             --bg: #0a0a0a;
             --text: #ededed;
             --accent: #ffffff;
             --border: #333333;
             --link: #60a5fa;
+            --ai-bg: #1a1a1a;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -63,6 +63,16 @@
         button:hover {
             opacity: 0.8;
         }
+        .ai-summary {
+            display: none;
+            background: var(--ai-bg);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 1.15rem;
+            line-height: 1.6;
+            border-top: 4px solid var(--accent);
+        }
         .result-item {
             margin-bottom: 30px;
             padding-left: 15px;
@@ -112,74 +122,71 @@
             <button type="submit">FETCH</button>
         </form>
 
-        <div id="loading">Searching...</div>
+        <div id="loading">Searching and generating AI summary...</div>
+        <div id="aiSummary" class="ai-summary"></div>
         <div id="resultsContainer"></div>
     </div>
 
     <script>
         // === CONFIGURATION ===
-        // Paste your exact Codespace Port 8080 URL here (no trailing slash)
-        const SEARXNG_BASE_URL = "https://vigilant-space-broccoli-q7j6vgwjpgr5366w9-8080.app.github.dev";
+        // Change this to match your existing worker or the new one you deployed
+        const WORKER_URL = "https://worker.search.cobinar.com";
 
         // === DOM ELEMENTS ===
         const form = document.getElementById('searchForm');
         const input = document.getElementById('searchInput');
         const resultsContainer = document.getElementById('resultsContainer');
+        const aiSummaryDiv = document.getElementById('aiSummary');
         const loading = document.getElementById('loading');
 
-        // === EVENT LISTENER ===
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Stop page from refreshing
-            
+            e.preventDefault();
             const query = input.value.trim();
             if (!query) return;
 
-            // Clear UI and show loading text
             resultsContainer.innerHTML = '';
+            aiSummaryDiv.style.display = 'none';
             loading.style.display = 'block';
 
             try {
-                // Build the endpoint URL requesting JSON format
-                const endpoint = `${SEARXNG_BASE_URL}/search?q=${encodeURIComponent(query)}&format=json`;
-                
-                // Fire the request to the SearXNG backend
+                // Fetch data securely through your Cloudflare Worker proxy
+                const endpoint = `${WORKER_URL}/?q=${encodeURIComponent(query)}`;
                 const response = await fetch(endpoint);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                 
-                // Parse the JSON payload
                 const data = await response.json();
-                
                 loading.style.display = 'none';
 
-                // Loop through the array and render HTML for each result
+                // 1. Render AI Summary
+                if (data.ai_summary) {
+                    aiSummaryDiv.innerHTML = `<strong>✨ AI Answer:</strong><br><br>${data.ai_summary}`;
+                    aiSummaryDiv.style.display = 'block';
+                }
+
+                // 2. Render Search Results
                 if (data.results && data.results.length > 0) {
                     data.results.forEach(result => {
                         const resultDiv = document.createElement('div');
                         resultDiv.className = 'result-item';
-                        
                         resultDiv.innerHTML = `
                             <a href="${result.url}" class="result-title" target="_blank">${result.title}</a>
                             <div class="result-url">${result.url}</div>
                             <div class="result-content">${result.content || 'No description available.'}</div>
                             <div class="meta-info">Engine: ${result.engine}</div>
                         `;
-                        
                         resultsContainer.appendChild(resultDiv);
                     });
                 } else {
-                    resultsContainer.innerHTML = '<p>No results found for this query.</p>';
+                    resultsContainer.innerHTML = '<p>No results found.</p>';
                 }
 
             } catch (error) {
                 loading.style.display = 'none';
-                console.error("Fetch error:", error);
                 resultsContainer.innerHTML = `
                     <p style="color: #ef4444;">
                         <strong>Connection Error:</strong> ${error.message} <br><br>
-                        <em>Check that your Codespace URL is correct and the port is set to Public.</em>
+                        <em>Ensure your Cloudflare Worker URL is correct and your GitHub Codespace is awake.</em>
                     </p>
                 `;
             }
