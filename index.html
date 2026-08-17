@@ -12,6 +12,7 @@
             --border: #333333;
             --link: #60a5fa;
             --ai-bg: #1a1a1a;
+            --nav-text: #888888;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -35,7 +36,7 @@
         form {
             display: flex;
             gap: 10px;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
         input {
             flex: 1;
@@ -46,6 +47,7 @@
             font-size: 1.1rem;
             outline: none;
             transition: border-color 0.2s;
+            border-radius: 4px;
         }
         input:focus {
             border-color: var(--accent);
@@ -59,10 +61,54 @@
             font-weight: bold;
             cursor: pointer;
             transition: opacity 0.2s;
+            border-radius: 4px;
         }
         button:hover {
             opacity: 0.8;
         }
+        
+        /* Navigation Bar Styles */
+        .nav-bar {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            scrollbar-width: none; /* Firefox */
+        }
+        .nav-bar::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+        .nav-item {
+            color: var(--nav-text);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            white-space: nowrap;
+            padding-bottom: 10px;
+            transition: color 0.2s;
+            position: relative;
+        }
+        .nav-item:hover {
+            color: var(--text);
+        }
+        .nav-item.active {
+            color: var(--accent);
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent);
+        }
+        .nav-tools {
+            margin-left: auto; /* Pushes Tools to the far right */
+        }
+
         .ai-summary {
             display: none;
             background: var(--ai-bg);
@@ -122,14 +168,25 @@
             <button type="submit">FETCH</button>
         </form>
 
-        <div id="loading">Searching and generating AI summary...</div>
+        <!-- New Navigation Bar -->
+        <div class="nav-bar" id="navBar">
+            <div class="nav-item active" data-category="ai">AI Mode</div>
+            <div class="nav-item" data-category="general">All</div>
+            <div class="nav-item" data-category="videos">Videos</div>
+            <div class="nav-item" data-category="images">Images</div>
+            <div class="nav-item" data-category="short-videos">Short videos</div>
+            <div class="nav-item" data-category="shopping">Shopping</div>
+            <div class="nav-item" data-category="it">Forums</div>
+            <div class="nav-item" data-category="more">More</div>
+            <div class="nav-item nav-tools" data-category="tools">Tools</div>
+        </div>
+
+        <div id="loading">Processing query...</div>
         <div id="aiSummary" class="ai-summary"></div>
         <div id="resultsContainer"></div>
     </div>
 
     <script>
-        // === CONFIGURATION ===
-        // Change this to match your existing worker or the new one you deployed
         const WORKER_URL = "https://worker.search.cobinar.com";
 
         // === DOM ELEMENTS ===
@@ -138,7 +195,29 @@
         const resultsContainer = document.getElementById('resultsContainer');
         const aiSummaryDiv = document.getElementById('aiSummary');
         const loading = document.getElementById('loading');
+        const navItems = document.querySelectorAll('.nav-item');
 
+        // Track current category state
+        let currentCategory = 'ai';
+
+        // === NAVIGATION LOGIC ===
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Remove active class from all
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // Add active class to clicked item
+                e.target.classList.add('active');
+                // Update state
+                currentCategory = e.target.getAttribute('data-category');
+                
+                // If there's already a search term, auto-trigger a new search on tab switch
+                if (input.value.trim() !== '') {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+
+        // === SEARCH LOGIC ===
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const query = input.value.trim();
@@ -149,8 +228,9 @@
             loading.style.display = 'block';
 
             try {
-                // Fetch data securely through your Cloudflare Worker proxy
-                const endpoint = `${WORKER_URL}/?q=${encodeURIComponent(query)}`;
+                // Note: We are passing the category to the worker, but the worker needs
+                // a minor update to actually send this category to SearXNG.
+                const endpoint = `${WORKER_URL}/?q=${encodeURIComponent(query)}&category=${currentCategory}`;
                 const response = await fetch(endpoint);
                 
                 if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
@@ -158,13 +238,13 @@
                 const data = await response.json();
                 loading.style.display = 'none';
 
-                // 1. Render AI Summary
-                if (data.ai_summary) {
+                // Render AI Summary ONLY if we are in AI Mode or All
+                if (data.ai_summary && (currentCategory === 'ai' || currentCategory === 'general')) {
                     aiSummaryDiv.innerHTML = `<strong>✨ AI Answer:</strong><br><br>${data.ai_summary}`;
                     aiSummaryDiv.style.display = 'block';
                 }
 
-                // 2. Render Search Results
+                // Render Search Results
                 if (data.results && data.results.length > 0) {
                     data.results.forEach(result => {
                         const resultDiv = document.createElement('div');
@@ -186,7 +266,7 @@
                 resultsContainer.innerHTML = `
                     <p style="color: #ef4444;">
                         <strong>Connection Error:</strong> ${error.message} <br><br>
-                        <em>Ensure your Cloudflare Worker URL is correct and your GitHub Codespace is awake.</em>
+                        <em>Ensure your backend is running.</em>
                     </p>
                 `;
             }
