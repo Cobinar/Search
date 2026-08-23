@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "911889107858",
+    "project_id": "binaris-ai",
+    "storage_bucket": "binaris-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:911889107858:android:349c6291d93909f4f74f4b",
+        "android_client_info": {
+          "package_name": "com.cobinar.binaris"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWl_XgzddMYXG1ubvOASuSgTjR5BWK2ys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
