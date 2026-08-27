@@ -63,7 +63,8 @@
       "expo-asset"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "tsconfigPaths": true
     },
     "updates": {
       "url": "https://u.expo.dev/68dce3bf-0213-43c2-86de-77175dd263df",
