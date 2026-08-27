@@ -15,7 +15,8 @@ export default function SignIn() {
   const google = useGoogleAuth();
 
   useEffect(() => {
-    if (user) router.replace('/(app)/inbox/inbox');
+    // FIXED: Using typed routing object instead of a hardcoded string
+    if (user) router.replace({ pathname: '/(app)/inbox/[folder]', params: { folder: 'inbox' } });
   }, [user]);
 
   const busy = cobinar.isSigningIn || google.isSigningIn;
