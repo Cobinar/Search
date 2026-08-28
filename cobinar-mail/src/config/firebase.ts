@@ -2,7 +2,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { initializeAuth, getReactNativePersistence, type Auth } from 'firebase/auth';
 import { getFirestore, initializeFirestore } from 'firebase/firestore';
 import { Platform } from 'react-native';
-import { secureAsyncStorage } from '@/security/secureAsyncStorage';
+import { secureAsyncStorage } from '@/security';
 
 /**
  * Same Firebase project as webmail/index.html — this is one mailbox
@@ -21,10 +21,9 @@ export const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 // On native, back auth persistence with the chunked SecureStore adapter
 // (Keychain/Keystore) instead of plain AsyncStorage — see
-// src/security/secureAsyncStorage.ts for exactly what that buys you and
-// why it needs chunking. On web (if this app is ever run via `expo start
-// --web`), fall back to the standard web SDK, which handles its own
-// persistence.
+// src/security.ts for exactly what that buys you and why it needs
+// chunking. On web (if this app is ever run via `expo start --web`),
+// fall back to the standard web SDK, which handles its own persistence.
 let authInstance: Auth;
 if (Platform.OS === 'web') {
   // eslint-disable-next-line @typescript-eslint/no-var-requires

@@ -1,9 +1,8 @@
 /**
- * Ported 1:1 from webmail/index.html's :root custom properties, so the
- * mobile app reads as the same product rather than a re-skin. React
- * Native has no box-shadow, so the neobrutalist "hard offset shadow" is
- * rebuilt from a solid-color View positioned behind each surface — see
- * <HardShadow> in components/Surface.tsx.
+ * Ported 1:1 from webmail/index.html's :root custom properties. React
+ * Native has no box-shadow, so the "hard offset shadow" look is rebuilt
+ * with a real positioned View — see HardShadowBox / NeoButton in
+ * components.tsx.
  */
 export const colors = {
   paper: '#EFEDE6',
@@ -36,15 +35,6 @@ export const avatarPalette: Record<string, string> = {
 };
 
 export const borderWidth = { standard: 2, structural: 3 } as const;
-
-// Offsets used by <HardShadow>. Native has no blur — these are flat,
-// solid-color offsets exactly like the web version's `Npx Npx 0 var(--ink)`.
 export const shadow = { sm: 3, md: 6, lg: 10 } as const;
-
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
-
-export const radius = 0; // squared corners, everywhere, deliberately — see the web redesign notes
-
-export const fontSizes = {
-  xs: 11, sm: 12.5, base: 14, md: 15, lg: 17, xl: 20, xxl: 25,
-} as const;
+export const fontSizes = { xs: 11, sm: 12.5, base: 14, md: 15, lg: 17, xl: 20, xxl: 25 } as const;

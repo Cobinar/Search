@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Redirect } from 'expo-router';
-import { useAuthUser } from '@/auth/useAuthUser';
-import { colors } from '@/theme/tokens';
+import { useAuthUser } from '@/auth';
+import { colors } from '@/theme';
 
 export default function Index() {
   const { user, initializing } = useAuthUser();
@@ -15,5 +15,9 @@ export default function Index() {
     );
   }
 
-  return <Redirect href={user ? '/(app)/inbox/inbox' : '/sign-in'} />;
+  // NOTE: route groups like (app) never appear in the actual path — a
+  // file at app/(app)/inbox/[folder]/index.tsx resolves to /inbox/[folder],
+  // not /(app)/inbox/[folder]. Every navigation call in this app uses the
+  // group-free form for exactly this reason.
+  return <Redirect href={user ? '/inbox/inbox' : '/sign-in'} />;
 }
