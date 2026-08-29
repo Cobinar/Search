@@ -1,0 +1,21 @@
+version: '3'
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: redis-server --save "" --appendonly "no"
+    restart: always
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./settings.yml:/etc/searxng/settings.yml:ro
+    environment:
+      - SEARXNG_SECRET=cobinar_super_secret_key_2026
+      - SEARXNG_BASE_URL=/
+    depends_on:
+      - redis
+    restart: always

@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "Bloomlili",
+    "slug": "my-native-app",
+    "scheme": "bloomlili",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#1C2035",
+    "newArchEnabled": true,
+
+    "ios": {
+      "bundleIdentifier": "com.bloomlili",
+      "supportsTablet": false,
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": true
+      }
+    },
+
+    "android": {
+      "package": "com.cobinar.bloomlili",
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "backgroundColor": "#1C2035"
+      }
+    },
+
+    "plugins": [
+      "expo-router",
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": false,
+          "style": "light"
+        }
+      ],
+      [
+        "expo-status-bar",
+        {
+          "style": "light"
+        }
+      ]
+    ],
+
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/90f02e57-4d6e-4af5-8ae2-c591bbe6e844",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
+
+    "extra": {
+      "eas": {
+        "projectId": "90f02e57-4d6e-4af5-8ae2-c591bbe6e844"
+      }
+    }
+  }
+}

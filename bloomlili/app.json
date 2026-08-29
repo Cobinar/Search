@@ -1,0 +1,96 @@
+{
+  "expo": {
+    "name": "Bloomlili",
+    "slug": "bloomlili",
+    "scheme": "bloomlili",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    
+    "backgroundColor": "#1C2035",
+    "icon": "./assets/logo.png",
+    
+    "newArchEnabled": true,
+
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#C8FF00"
+    },
+
+    "ios": {
+      "bundleIdentifier": "com.cobinar.bloomlili",
+      "supportsTablet": false,
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": true,
+        "NSCameraUsageDescription": "Bloomlili uses your camera for video calls and to add photos/videos to your Status.",
+        "NSMicrophoneUsageDescription": "Bloomlili uses your microphone for voice and video calls.",
+        "NSPhotoLibraryUsageDescription": "Bloomlili needs access to your photos to post to your Status or set a profile picture."
+      }
+    },
+
+    "android": {
+      "package": "com.cobinar.bloomlili",
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#C8FF00"
+      },
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+
+    "plugins": [
+      "expo-router",
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": false,
+          "style": "light"
+        }
+      ],
+      [
+        "expo-status-bar",
+        {
+          "style": "light"
+        }
+      ],
+      [
+        "@config-plugins/react-native-webrtc",
+        {
+          "cameraPermission": "Bloomlili uses your camera for video calls.",
+          "microphonePermission": "Bloomlili uses your microphone for voice and video calls."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/logo.png",
+          "color": "#C8FF00"
+        }
+      ],
+      "expo-image-picker",
+      "expo-video"
+    ],
+
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2c36d74b-c9cf-42c9-8fd8-f3893d42d49a",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2c36d74b-c9cf-42c9-8fd8-f3893d42d49a"
+      }
+    },
+    "owner": "cobinar"
+  }
+}

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cobinar Search Engine</title>
     <style>
+        /* Clean, brutalist dark mode UI */
         :root {
             --bg: #0a0a0a;
             --text: #ededed;
@@ -37,6 +38,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            margin-bottom: 40px;
         }
         input {
             flex: 1;
@@ -183,11 +185,15 @@
 
         <div id="loading">Processing query...</div>
         <div id="aiSummary" class="ai-summary"></div>
+        <div id="loading">Searching...</div>
         <div id="resultsContainer"></div>
     </div>
 
     <script>
         const WORKER_URL = "https://worker.search.cobinar.com";
+        // === CONFIGURATION ===
+        // Paste your exact Codespace Port 8080 URL here (no trailing slash)
+        const SEARXNG_BASE_URL = "https://vigilant-space-broccoli-q7j6vgwjpgr5366w9-8080.app.github.dev";
 
         // === DOM ELEMENTS ===
         const form = document.getElementById('searchForm');
@@ -267,6 +273,61 @@
                     <p style="color: #ef4444;">
                         <strong>Connection Error:</strong> ${error.message} <br><br>
                         <em>Ensure your backend is running.</em>
+        const loading = document.getElementById('loading');
+
+        // === EVENT LISTENER ===
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Stop page from refreshing
+            
+            const query = input.value.trim();
+            if (!query) return;
+
+            // Clear UI and show loading text
+            resultsContainer.innerHTML = '';
+            loading.style.display = 'block';
+
+            try {
+                // Build the endpoint URL requesting JSON format
+                const endpoint = `${SEARXNG_BASE_URL}/search?q=${encodeURIComponent(query)}&format=json`;
+                
+                // Fire the request to the SearXNG backend
+                const response = await fetch(endpoint);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                
+                // Parse the JSON payload
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+
+                // Loop through the array and render HTML for each result
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach(result => {
+                        const resultDiv = document.createElement('div');
+                        resultDiv.className = 'result-item';
+                        
+                        resultDiv.innerHTML = `
+                            <a href="${result.url}" class="result-title" target="_blank">${result.title}</a>
+                            <div class="result-url">${result.url}</div>
+                            <div class="result-content">${result.content || 'No description available.'}</div>
+                            <div class="meta-info">Engine: ${result.engine}</div>
+                        `;
+                        
+                        resultsContainer.appendChild(resultDiv);
+                    });
+                } else {
+                    resultsContainer.innerHTML = '<p>No results found for this query.</p>';
+                }
+
+            } catch (error) {
+                loading.style.display = 'none';
+                console.error("Fetch error:", error);
+                resultsContainer.innerHTML = `
+                    <p style="color: #ef4444;">
+                        <strong>Connection Error:</strong> ${error.message} <br><br>
+                        <em>Check that your Codespace URL is correct and the port is set to Public.</em>
                     </p>
                 `;
             }
