@@ -3,334 +3,654 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cobinar Search Engine</title>
+    <title>KINETIC // Public Knowledge Engine</title>
     <style>
-        /* Clean, brutalist dark mode UI */
         :root {
-            --bg: #0a0a0a;
-            --text: #ededed;
-            --accent: #ffffff;
-            --border: #333333;
-            --link: #60a5fa;
-            --ai-bg: #1a1a1a;
-            --nav-text: #888888;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            width: 100%;
-            max-width: 800px;
-        }
-        h1 {
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 30px;
-        }
-        form {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            margin-bottom: 40px;
-        }
-        input {
-            flex: 1;
-            background: transparent;
-            border: 2px solid var(--border);
-            color: var(--text);
-            padding: 15px 20px;
-            font-size: 1.1rem;
-            outline: none;
-            transition: border-color 0.2s;
-            border-radius: 4px;
-        }
-        input:focus {
-            border-color: var(--accent);
-        }
-        button {
-            background: var(--text);
-            color: var(--bg);
-            border: none;
-            padding: 0 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            border-radius: 4px;
-        }
-        button:hover {
-            opacity: 0.8;
-        }
-        
-        /* Navigation Bar Styles */
-        .nav-bar {
-            display: flex;
-            gap: 20px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border);
-            scrollbar-width: none; /* Firefox */
-        }
-        .nav-bar::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
-        }
-        .nav-item {
-            color: var(--nav-text);
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            white-space: nowrap;
-            padding-bottom: 10px;
-            transition: color 0.2s;
-            position: relative;
-        }
-        .nav-item:hover {
-            color: var(--text);
-        }
-        .nav-item.active {
-            color: var(--accent);
-        }
-        .nav-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--accent);
-        }
-        .nav-tools {
-            margin-left: auto; /* Pushes Tools to the far right */
+            --bg-primary: #FFFFFF;
+            --bg-subtle: #F9F9F8;
+            --text-primary: #0F0F0F;
+            --text-secondary: #5C5C5C;
+            --accent-orange: #FF4F00;
+            --accent-orange-hover: #E04600;
+            --border-color: #E5E5E5;
+            --ease-swiss: cubic-bezier(0.16, 1, 0.3, 1);
+            --font-sans: "Helvetica Neue", Helvetica, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
         }
 
-        .ai-summary {
-            display: none;
-            background: var(--ai-bg);
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            font-size: 1.15rem;
-            line-height: 1.6;
-            border-top: 4px solid var(--accent);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        .result-item {
-            margin-bottom: 30px;
-            padding-left: 15px;
-            border-left: 3px solid var(--border);
-        }
-        .result-title {
-            color: var(--link);
-            font-size: 1.25rem;
-            font-weight: bold;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .result-title:hover {
-            text-decoration: underline;
-        }
-        .result-url {
-            color: #888;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-        }
-        .result-content {
-            font-size: 1rem;
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
             line-height: 1.5;
-            color: #cccccc;
+            overflow-x: hidden;
         }
-        .meta-info {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 8px;
+
+        /* Swiss Top Utility Bar */
+        header {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 2.5rem;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .brand {
+            grid-column: span 6;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: -0.03em;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            cursor: pointer;
         }
-        #loading {
+
+        .brand-mark {
+            width: 14px;
+            height: 14px;
+            background-color: var(--accent-orange);
+            display: inline-block;
+            transition: transform 0.5s var(--ease-swiss);
+        }
+
+        .brand:hover .brand-mark {
+            transform: rotate(90deg);
+        }
+
+        .meta-status {
+            grid-column: span 6;
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background: var(--accent-orange);
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Progress Bar */
+        .loader-bar {
+            height: 3px;
+            width: 100%;
+            background: transparent;
+            overflow: hidden;
+            position: fixed;
+            top: 63px;
+            left: 0;
+            z-index: 101;
+            pointer-events: none;
+        }
+
+        .loader-bar.active::after {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 35%;
+            background: var(--accent-orange);
+            animation: slideLoad 1s infinite var(--ease-swiss);
+        }
+
+        @keyframes slideLoad {
+            0% { left: -35%; }
+            100% { left: 100%; }
+        }
+
+        /* Main Structural Grid */
+        main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+        }
+
+        .hero-section {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+            padding: 5rem 0 4rem 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: padding 0.6s var(--ease-swiss);
+        }
+
+        .hero-section.compact {
+            padding: 2.5rem 0 2.5rem 0;
+        }
+
+        .hero-kicker {
+            grid-column: span 12;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        .hero-title {
+            grid-column: span 10;
+            font-size: clamp(3rem, 6.5vw, 6.25rem);
+            font-weight: 800;
+            line-height: 0.96;
+            letter-spacing: -0.045em;
+            color: var(--text-primary);
+            transition: font-size 0.6s var(--ease-swiss);
+        }
+
+        .hero-section.compact .hero-title {
+            font-size: clamp(2rem, 3.5vw, 3rem);
+        }
+
+        .hero-title span {
+            color: var(--accent-orange);
+        }
+
+        /* Search Input Module */
+        .search-wrapper {
+            grid-column: span 12;
+            margin-top: 1.5rem;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            border: 2px solid var(--text-primary);
+            background: var(--bg-primary);
+            transition: border-color 0.3s var(--ease-swiss), box-shadow 0.3s var(--ease-swiss);
+        }
+
+        .search-form:focus-within {
+            border-color: var(--accent-orange);
+            box-shadow: 0 12px 32px rgba(255, 79, 0, 0.08);
+        }
+
+        .search-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 1.5rem 1.75rem;
+            font-family: var(--font-sans);
+            font-size: 1.35rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            background: transparent;
+        }
+
+        .search-input::placeholder {
+            color: #A3A3A3;
+        }
+
+        .clear-btn {
+            background: transparent;
+            border: none;
+            padding: 0 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            cursor: pointer;
             display: none;
-            font-weight: bold;
-            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .clear-btn.visible {
+            display: inline-block;
+        }
+
+        .clear-btn:hover {
+            color: var(--accent-orange);
+        }
+
+        .search-btn {
+            background-color: var(--accent-orange);
+            color: #FFFFFF;
+            border: none;
+            padding: 0 2.75rem;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: background-color 0.25s var(--ease-swiss);
+        }
+
+        .search-btn:hover {
+            background-color: var(--accent-orange-hover);
+        }
+
+        .search-btn svg {
+            transition: transform 0.3s var(--ease-swiss);
+        }
+
+        .search-btn:hover svg {
+            transform: translateX(4px);
+        }
+
+        /* Quick Filter Pills */
+        .quick-queries {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            align-items: center;
+        }
+
+        .quick-label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-right: 0.5rem;
+        }
+
+        .pill {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.9rem;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.25s var(--ease-swiss);
+        }
+
+        .pill:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+            background: #FFFFFF;
+        }
+
+        /* Results Grid Layout */
+        .results-layout {
+            display: none;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2.5rem;
+            padding: 3rem 0 6rem 0;
+        }
+
+        .results-layout.active {
+            display: grid;
+        }
+
+        .results-sidebar {
+            grid-column: span 3;
+            border-right: 1px solid var(--border-color);
+            padding-right: 2rem;
+        }
+
+        .sidebar-metric {
+            margin-bottom: 2rem;
+        }
+
+        .metric-label {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.06em;
+            margin-bottom: 0.35rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: var(--text-primary);
+        }
+
+        .metric-value.orange {
+            color: var(--accent-orange);
+        }
+
+        .results-feed {
+            grid-column: span 9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Individual Result Row */
+        .result-card {
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            gap: 1.5rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border-color);
+            opacity: 0;
+            transform: translateY(18px);
+            animation: revealUp 0.55s var(--ease-swiss) forwards;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .result-card:first-child {
+            padding-top: 0;
+        }
+
+        @keyframes revealUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-index {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-orange);
+            padding-top: 0.35rem;
+        }
+
+        .result-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .result-meta {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .result-title {
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            color: var(--text-primary);
+            transition: color 0.2s var(--ease-swiss);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-card:hover .result-title {
+            color: var(--accent-orange);
+        }
+
+        .result-snippet {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 68ch;
+            line-height: 1.6;
+        }
+
+        .result-snippet .searchmatch {
+            background-color: rgba(255, 79, 0, 0.12);
+            color: var(--accent-orange);
+            font-weight: 600;
+            padding: 0 3px;
+        }
+
+        .state-banner {
+            padding: 3rem 0;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 900px) {
+            header, main { padding-left: 1.25rem; padding-right: 1.25rem; }
+            .hero-title { grid-column: span 12; }
+            .results-sidebar {
+                grid-column: span 12;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding-right: 0;
+                padding-bottom: 1.5rem;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 2rem;
+            }
+            .sidebar-metric { margin-bottom: 0; }
+            .results-feed { grid-column: span 12; }
+            .search-btn { padding: 0 1.5rem; }
+            .result-card { grid-template-columns: 44px 1fr; gap: 0.75rem; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Cobinar Search</h1>
-        
-        <form id="searchForm">
-            <input type="text" id="searchInput" placeholder="Search the web..." required>
-            <button type="submit">FETCH</button>
-        </form>
 
-        <!-- New Navigation Bar -->
-        <div class="nav-bar" id="navBar">
-            <div class="nav-item active" data-category="ai">AI Mode</div>
-            <div class="nav-item" data-category="general">All</div>
-            <div class="nav-item" data-category="videos">Videos</div>
-            <div class="nav-item" data-category="images">Images</div>
-            <div class="nav-item" data-category="short-videos">Short videos</div>
-            <div class="nav-item" data-category="shopping">Shopping</div>
-            <div class="nav-item" data-category="it">Forums</div>
-            <div class="nav-item" data-category="more">More</div>
-            <div class="nav-item nav-tools" data-category="tools">Tools</div>
+    <header>
+        <div class="brand" id="resetBrand" title="Reset Search">
+            <span class="brand-mark"></span>
+            KINETIC INDEX
         </div>
+        <div class="meta-status">
+            <span class="status-dot"></span>PUBLIC API // LIVE
+        </div>
+    </header>
 
-        <div id="loading">Processing query...</div>
-        <div id="aiSummary" class="ai-summary"></div>
-        <div id="loading">Searching...</div>
-        <div id="resultsContainer"></div>
-    </div>
+    <div class="loader-bar" id="loader"></div>
+
+    <main>
+        <section class="hero-section" id="hero">
+            <div class="hero-kicker">01 // OPEN KNOWLEDGE RETRIEVAL</div>
+            <h1 class="hero-title">Search the <span>public</span> web with precision.</h1>
+
+            <div class="search-wrapper">
+                <form class="search-form" id="searchForm">
+                    <input
+                        type="text"
+                        class="search-input"
+                        id="searchInput"
+                        placeholder="Enter a topic, concept, or entity..."
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="button" class="clear-btn" id="clearBtn">Clear</button>
+                    <button type="submit" class="search-btn">
+                        Query
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="quick-queries">
+                    <span class="quick-label">Suggested:</span>
+                    <button type="button" class="pill" data-query="Swiss International Style">Swiss Design</button>
+                    <button type="button" class="pill" data-query="Information retrieval">Information Retrieval</button>
+                    <button type="button" class="pill" data-query="Distributed computing">Distributed Systems</button>
+                    <button type="button" class="pill" data-query="Typography">Typography</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="results-layout" id="resultsSection">
+            <aside class="results-sidebar">
+                <div class="sidebar-metric">
+                    <div class="metric-label">Total Matches</div>
+                    <div class="metric-value orange" id="totalHits">0</div>
+                </div>
+                <div class="sidebar-metric">
+                    <div class="metric-label">Query Latency</div>
+                    <div class="metric-value" id="latencyMetric">0ms</div>
+                </div>
+                <div class="sidebar-metric">
+                    <div class="metric-label">Index Source</div>
+                    <div class="metric-value" style="font-size: 1.1rem; font-weight: 600;">Wikimedia Open</div>
+                </div>
+            </aside>
+
+            <div class="results-feed" id="resultsFeed"></div>
+        </section>
+    </main>
 
     <script>
-        const WORKER_URL = "https://worker.search.cobinar.com";
-        // === CONFIGURATION ===
-        // Paste your exact Codespace Port 8080 URL here (no trailing slash)
-        const SEARXNG_BASE_URL = "https://vigilant-space-broccoli-q7j6vgwjpgr5366w9-8080.app.github.dev";
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearBtn');
+            const resetBrand = document.getElementById('resetBrand');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsFeed = document.getElementById('resultsFeed');
+            const totalHitsEl = document.getElementById('totalHits');
+            const latencyMetricEl = document.getElementById('latencyMetric');
+            const loader = document.getElementById('loader');
+            const hero = document.getElementById('hero');
+            const pills = document.querySelectorAll('.pill');
 
-        // === DOM ELEMENTS ===
-        const form = document.getElementById('searchForm');
-        const input = document.getElementById('searchInput');
-        const resultsContainer = document.getElementById('resultsContainer');
-        const aiSummaryDiv = document.getElementById('aiSummary');
-        const loading = document.getElementById('loading');
-        const navItems = document.querySelectorAll('.nav-item');
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
 
-        // Track current category state
-        let currentCategory = 'ai';
+            function sanitizeSnippet(htmlSnippet) {
+                const temp = document.createElement('div');
+                temp.innerHTML = htmlSnippet;
+                const allowed = temp.querySelectorAll('span.searchmatch');
+                const markers = [];
+                allowed.forEach((el, i) => {
+                    markers.push(el.textContent);
+                    el.replaceWith(`__MATCH_${i}__`);
+                });
+                let safeText = escapeHtml(temp.textContent);
+                markers.forEach((word, i) => {
+                    safeText = safeText.replace(`__MATCH_${i}__`, `<span class="searchmatch">${escapeHtml(word)}</span>`);
+                });
+                return safeText;
+            }
 
-        // === NAVIGATION LOGIC ===
-        navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                // Remove active class from all
-                navItems.forEach(nav => nav.classList.remove('active'));
-                // Add active class to clicked item
-                e.target.classList.add('active');
-                // Update state
-                currentCategory = e.target.getAttribute('data-category');
-                
-                // If there's already a search term, auto-trigger a new search on tab switch
-                if (input.value.trim() !== '') {
-                    form.dispatchEvent(new Event('submit'));
+            async function executeSearch(query) {
+                const trimmed = query.trim();
+                if (!trimmed) return;
+
+                loader.classList.add('active');
+                hero.classList.add('compact');
+                clearBtn.classList.add('visible');
+                const startTime = performance.now();
+
+                try {
+                    const endpoint = `https://en.wikipedia.org/w/api.php?action=query&list=search&utf8=&format=json&origin=*&srlimit=12&srsearch=${encodeURIComponent(trimmed)}`;
+                    const response = await fetch(endpoint);
+                    if (!response.ok) throw new Error('Network error');
+                    const data = await response.json();
+
+                    const endTime = performance.now();
+                    const latency = Math.round(endTime - startTime);
+
+                    const searchItems = (data.query && data.query.search) ? data.query.search : [];
+                    const totalHits = (data.query && data.query.searchinfo) ? data.query.searchinfo.totalhits : 0;
+
+                    renderResults(searchItems, totalHits, latency, trimmed);
+                } catch (error) {
+                    resultsSection.classList.add('active');
+                    resultsFeed.innerHTML = `<div class="state-banner">Connection error retrieving public index. Check your internet connection and try again.</div>`;
+                } finally {
+                    loader.classList.remove('active');
+                }
+            }
+
+            function renderResults(items, totalHits, latency, query) {
+                resultsSection.classList.add('active');
+                totalHitsEl.textContent = totalHits.toLocaleString();
+                latencyMetricEl.textContent = `${latency}ms`;
+                resultsFeed.innerHTML = '';
+
+                if (!items || items.length === 0) {
+                    resultsFeed.innerHTML = `<div class="state-banner">No public records matched "<strong>${escapeHtml(query)}</strong>". Try broader keywords.</div>`;
+                    return;
+                }
+
+                items.forEach((item, index) => {
+                    const url = `https://en.wikipedia.org/?curid=${item.pageid}`;
+                    const indexNumber = String(index + 1).padStart(2, '0');
+                    const wordCount = item.wordcount ? `${item.wordcount.toLocaleString()} WORDS` : 'ARTICLE';
+
+                    const card = document.createElement('a');
+                    card.href = url;
+                    card.target = '_blank';
+                    card.rel = 'noopener noreferrer';
+                    card.className = 'result-card';
+                    card.style.animationDelay = `${index * 0.05}s`;
+
+                    card.innerHTML = `
+                        <div class="result-index">[${indexNumber}]</div>
+                        <div class="result-content">
+                            <div class="result-meta">EN.WIKIPEDIA.ORG // ${wordCount}</div>
+                            <h2 class="result-title">
+                                ${escapeHtml(item.title)}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                                    <polyline points="7 7 17 7 17 17"></polyline>
+                                </svg>
+                            </h2>
+                            <p class="result-snippet">${sanitizeSnippet(item.snippet || '')}...</p>
+                        </div>
+                    `;
+                    resultsFeed.appendChild(card);
+                });
+            }
+
+            function resetUI() {
+                searchInput.value = '';
+                clearBtn.classList.remove('visible');
+                hero.classList.remove('compact');
+                resultsSection.classList.remove('active');
+                resultsFeed.innerHTML = '';
+                searchInput.focus();
+            }
+
+            searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                executeSearch(searchInput.value);
+            });
+
+            searchInput.addEventListener('input', () => {
+                if (searchInput.value.trim().length > 0) {
+                    clearBtn.classList.add('visible');
+                } else {
+                    clearBtn.classList.remove('visible');
                 }
             });
-        });
 
-        // === SEARCH LOGIC ===
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const query = input.value.trim();
-            if (!query) return;
+            clearBtn.addEventListener('click', resetUI);
+            resetBrand.addEventListener('click', resetUI);
 
-            resultsContainer.innerHTML = '';
-            aiSummaryDiv.style.display = 'none';
-            loading.style.display = 'block';
-
-            try {
-                // Note: We are passing the category to the worker, but the worker needs
-                // a minor update to actually send this category to SearXNG.
-                const endpoint = `${WORKER_URL}/?q=${encodeURIComponent(query)}&category=${currentCategory}`;
-                const response = await fetch(endpoint);
-                
-                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-                
-                const data = await response.json();
-                loading.style.display = 'none';
-
-                // Render AI Summary ONLY if we are in AI Mode or All
-                if (data.ai_summary && (currentCategory === 'ai' || currentCategory === 'general')) {
-                    aiSummaryDiv.innerHTML = `<strong>✨ AI Answer:</strong><br><br>${data.ai_summary}`;
-                    aiSummaryDiv.style.display = 'block';
-                }
-
-                // Render Search Results
-                if (data.results && data.results.length > 0) {
-                    data.results.forEach(result => {
-                        const resultDiv = document.createElement('div');
-                        resultDiv.className = 'result-item';
-                        resultDiv.innerHTML = `
-                            <a href="${result.url}" class="result-title" target="_blank">${result.title}</a>
-                            <div class="result-url">${result.url}</div>
-                            <div class="result-content">${result.content || 'No description available.'}</div>
-                            <div class="meta-info">Engine: ${result.engine}</div>
-                        `;
-                        resultsContainer.appendChild(resultDiv);
-                    });
-                } else {
-                    resultsContainer.innerHTML = '<p>No results found.</p>';
-                }
-
-            } catch (error) {
-                loading.style.display = 'none';
-                resultsContainer.innerHTML = `
-                    <p style="color: #ef4444;">
-                        <strong>Connection Error:</strong> ${error.message} <br><br>
-                        <em>Ensure your backend is running.</em>
-        const loading = document.getElementById('loading');
-
-        // === EVENT LISTENER ===
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Stop page from refreshing
-            
-            const query = input.value.trim();
-            if (!query) return;
-
-            // Clear UI and show loading text
-            resultsContainer.innerHTML = '';
-            loading.style.display = 'block';
-
-            try {
-                // Build the endpoint URL requesting JSON format
-                const endpoint = `${SEARXNG_BASE_URL}/search?q=${encodeURIComponent(query)}&format=json`;
-                
-                // Fire the request to the SearXNG backend
-                const response = await fetch(endpoint);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
-                
-                // Parse the JSON payload
-                const data = await response.json();
-                
-                loading.style.display = 'none';
-
-                // Loop through the array and render HTML for each result
-                if (data.results && data.results.length > 0) {
-                    data.results.forEach(result => {
-                        const resultDiv = document.createElement('div');
-                        resultDiv.className = 'result-item';
-                        
-                        resultDiv.innerHTML = `
-                            <a href="${result.url}" class="result-title" target="_blank">${result.title}</a>
-                            <div class="result-url">${result.url}</div>
-                            <div class="result-content">${result.content || 'No description available.'}</div>
-                            <div class="meta-info">Engine: ${result.engine}</div>
-                        `;
-                        
-                        resultsContainer.appendChild(resultDiv);
-                    });
-                } else {
-                    resultsContainer.innerHTML = '<p>No results found for this query.</p>';
-                }
-
-            } catch (error) {
-                loading.style.display = 'none';
-                console.error("Fetch error:", error);
-                resultsContainer.innerHTML = `
-                    <p style="color: #ef4444;">
-                        <strong>Connection Error:</strong> ${error.message} <br><br>
-                        <em>Check that your Codespace URL is correct and the port is set to Public.</em>
-                    </p>
-                `;
-            }
+            pills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    const q = pill.getAttribute('data-query');
+                    searchInput.value = q;
+                    executeSearch(q);
+                });
+            });
         });
     </script>
 </body>
